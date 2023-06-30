@@ -330,8 +330,8 @@ class VisNode:
         pygame.draw.rect(self.surface,Colors[1],(0,0,100,self.sizeY),5)     # border
         
         # Render Text
-        self.surface.blit(font.render(self.text,False,Colors[1]),(37,4))    # Value
-        self.surface.blit(font.render(self.text,False,Colors[1]),(37,4))    # Ptr
+        self.surface.blit(font.render(self.value,False,Colors[1]),(37,4))    # Value
+        # self.surface.blit(font.render(self.ptr,False,Colors[1]),(37,4))    # Ptr
 
         Screen.blit(self.surface,self.rect)
     
