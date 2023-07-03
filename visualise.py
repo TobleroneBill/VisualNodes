@@ -1,4 +1,7 @@
+# /_______________/Graphical representations of Nodes and Data structures/_______________/
+
 import DataStruct
+import NodeColors
 
 import pygame
 import sys
@@ -13,6 +16,11 @@ icon = pygame.image.load(r'C:\Users\JOE\Desktop\Visualisations\DataStructs\Asset
 mousePrev = None
 mouseDelta = [0,0]
 mouseSelected = None
+
+CursorImages = {
+    'idle': pygame.image.load('Assets\CursorIdle.png'),
+    'click': pygame.image.load('Assets\CursorClick.png'),
+}
 
 # Default Node settings
 NodeScale = 1
@@ -35,210 +43,11 @@ Colors = (
 (172, 186, 148),    # Bright Green
 )
 
-# Colors for the tops of nodes
-RandomColors = (
-(74, 109, 82),
-(49, 93, 57),
-(41, 97, 74),
-(41, 93, 74),
-(205, 76, 32),
-(246, 186, 74),
-(24, 80, 49),
-(8, 56, 24),
-(49, 109, 82),
-(238, 186, 90),
-(24, 76, 32),
-(205, 72, 32),
-(213, 60, 24),
-(32, 80, 41),
-(24, 68, 41),
-(8, 52, 24),
-(222, 190, 98),
-(213, 170, 82),
-(189, 52, 24),
-(82, 113, 90),
-(238, 186, 82),
-(82, 125, 98),
-(230, 170, 74),
-(238, 178, 49),
-(49, 101, 65),
-(180, 52, 16),
-(189, 48, 16),
-(222, 186, 98),
-(0, 48, 24),
-(49, 97, 74),
-(230, 178, 90),
-(82, 121, 98),
-(82, 117, 98),
-(230, 190, 98),
-(57, 121, 82),
-(213, 161, 65),
-(57, 117, 82),
-(49, 85, 57),
-(65, 101, 74),
-(32, 72, 49),
-(205, 56, 16),
-(32, 68, 41),
-(74, 129, 98),
-(0, 44, 16),
-(197, 64, 8),
-(74, 113, 90),
-(222, 186, 90),
-(189, 64, 24),
-(197, 48, 16),
-(222, 170, 74),
-(41, 101, 65),
-(197, 56, 24),
-(213, 165, 57),
-(49, 117, 74),
-(32, 97, 57),
-(32, 101, 65),
-(57, 93, 74),
-(57, 105, 82),
-(230, 170, 57),
-(57, 101, 65),
-(238, 182, 74),
-(189, 60, 24),
-(65, 125, 90),
-(230, 174, 49),
-(49, 113, 82),
-(49, 113, 74),
-(230, 174, 41),
-(57, 97, 65),
-(32, 89, 57),
-(32, 89, 65),
-(197, 52, 24),
-(74, 125, 90),
-(222, 182, 82),
-(32, 93, 65),
-(41, 105, 65),
-(197, 60, 16),
-(238, 190, 90),
-(230, 178, 49),
-(57, 105, 65),
-(65, 109, 74),
-(57, 105, 74),
-(230, 174, 57),
-(65, 109, 82),
-(213, 174, 82),
-(222, 170, 49),
-(57, 101, 74),
-(222, 174, 65),
-(222, 178, 65),
-(41, 97, 57),
-(230, 182, 90),
-(41, 97, 65),
-(41, 105, 74),
-(49, 101, 74),
-(222, 174, 41),
-(49, 105, 74),
-(222, 178, 74),
-(41, 93, 65),
-(230, 182, 82),
-(222, 165, 57),
-(222, 165, 65),
-(41, 89, 57),
-(57, 125, 90),
-(57, 113, 74),
-(57, 113, 82),
-(222, 165, 41),
-(32, 80, 57),
-(230, 174, 74),
-(230, 174, 82),
-(222, 178, 82),
-(65, 133, 90),
-(57, 109, 82),
-(213, 178, 82),
-(222, 178, 57),
-(41, 85, 57),
-(74, 117, 98),
-(213, 174, 74),
-(189, 52, 8),
-(230, 182, 65),
-(65, 125, 82),
-(74, 117, 90),
-(189, 52, 16),
-(57, 113, 90),
-(65, 117, 82),
-(65, 129, 90),
-(222, 178, 90),
-(213, 170, 74),
-(238, 178, 82),
-(230, 182, 98),
-(65, 105, 74),
-(65, 121, 82),
-(65, 105, 82),
-(41, 109, 74),
-(57, 97, 74),
-(8, 60, 32),
-(189, 56, 24),
-(189, 56, 16),
-(32, 93, 57),
-(238, 178, 74),
-(197, 60, 24),
-(213, 170, 65),
-(222, 174, 82),
-(57, 109, 74),
-(205, 48, 16),
-(230, 178, 57),
-(238, 182, 82),
-(230, 170, 49),
-(230, 170, 41),
-(41, 93, 57),
-(189, 60, 16),
-(222, 170, 65),
-(49, 101, 82),
-(222, 165, 49),
-(41, 89, 65),
-(49, 97, 57),
-(197, 64, 24),
-(222, 170, 57),
-(222, 182, 74),
-(41, 85, 49),
-(222, 174, 49),
-(65, 117, 90),
-(222, 174, 57),
-(197, 56, 16),
-(197, 56, 8),
-(41, 109, 65),
-(222, 182, 90),
-(230, 178, 74),
-(49, 109, 74),
-(230, 178, 65),
-(238, 178, 65),
-(197, 52, 16),
-(74, 121, 90),
-(222, 170, 41),
-(238, 190, 98),
-(222, 174, 90),
-(49, 105, 65),
-(230, 186, 82),
-(57, 125, 82),
-(49, 97, 65),
-(65, 113, 90),
-(230, 174, 65),
-(65, 113, 82),
-(57, 117, 90),
-(230, 178, 82),
-(65, 121, 90),
-(74, 125, 98),
-(205, 52, 16),
-(32, 85, 57),
-(74, 121, 98),
-(16, 60, 32),
-(222, 174, 74),
-(230, 182, 74),
-(65, 109, 90),
-(230, 170, 65),
-(49, 109, 65),
-(197, 68, 32),
-(180, 60, 16),
-(197, 68, 24)
-)
 
 # Calculates mouse movement
 def MouseCheck():
     global mouseDelta,mousePrev
+    # Update MouseDelta
     if mousePrev == None:
         mousePrev = pygame.mouse.get_pos()
     elif pygame.mouse.get_pos() != mousePrev:
@@ -251,7 +60,7 @@ def MouseCheck():
 #   - Things selected
 #   - Data structures
 #   - BG settings
-#
+
 class LevelManager:
     def __init__(self,DataStruct,WinText,debug=True):
         
@@ -263,6 +72,8 @@ class LevelManager:
         pygame.display.set_icon(icon)
         self.clock = pygame.time.Clock()
         self.debug = debug
+        pygame.mouse.set_visible(False)
+
 
         # Data stuff
         self.data = list(DataStruct)  # Holds the actual Data structure info
@@ -270,6 +81,7 @@ class LevelManager:
 
         # Gameplay stuff
         self.selected = None
+        self.mouseScreen = CursorImages['idle']
 
     #/________________________/Setup Methods/________________________/
     def GenerateVis(self):
@@ -291,10 +103,7 @@ class LevelManager:
                         visnodes.append(
                         VisNode(ptr,(random.randint(0,self.width-100),random.randint(0,self.height-100)))
                         )
-                        print(ptr.value)
                         ptr = ptr.ptr
-                    print('LinkedList')
-                        
             y += 100
         print([node.value for node in visnodes])
         return visnodes
@@ -324,7 +133,20 @@ class LevelManager:
         MouseCheck()
         for node in self.visData:
             node.Update(self.screen)
+        # Draw mouse over all
+        self.DrawMouse()
 
+    def DrawMouse(self):
+        match pygame.mouse.get_pressed():
+            case [0,0,0]:
+                self.mouseScreen = CursorImages['idle']
+            case [1,0,0]:
+                self.mouseScreen = CursorImages['click']
+        
+        self.screen.blit(self.mouseScreen,(
+            # mouse coords - half image coords to center
+            pygame.mouse.get_pos()[0]-self.mouseScreen.get_width()//2,  
+            pygame.mouse.get_pos()[1]-self.mouseScreen.get_height()//2))
 
 class VisNode:
     """
@@ -333,23 +155,23 @@ class VisNode:
     def __init__(self, Node, Vector2D) -> None:
         self.node = Node
         self.sizeY = NodeRect.height * NodeScale    # will increase based on if it has many pointers
-        
-        self.rect = pygame.Rect(Vector2D[0],Vector2D[1],NodeRect.width,self.sizeY)
-        
-        self.surface = pygame.surface.Surface((100,self.sizeY))
+
         self.value = f'{self.node.value}'
         self.ptrText = None
+
         if self.node.ptr != None:
-            #long lol
-            self.ptrText = f'{self.node.ptr.value}'
-        self.color = random.choice(RandomColors)
+            if type(self.node.ptr) == list:
+                
+                self.sizeY += 50 * (len(self.node.ptr)-1)
+            else:
+                self.ptrText = f'{self.node.ptr.value}' # long ass chain :0 
         
-    
-    def PtrText(self):
-        if self.ptrNode is None:
-            return f' '
-        else:
-            return f'{self.ptrNode.value}'
+
+        self.rect = pygame.Rect(Vector2D[0],Vector2D[1],NodeRect.width,self.sizeY)
+        self.surface = pygame.surface.Surface((100,self.sizeY))
+
+        self.color = NodeColors.RandomColor()
+        
         
     def Draw(self, Screen):
         # Node Base 
@@ -358,10 +180,28 @@ class VisNode:
         pygame.draw.rect(self.surface,Colors[1],(0,0,100,self.sizeY),5)     # border
         
         # Render Text
-        self.surface.blit(font.render(self.value,False,Colors[1]),(37,4))    # Value
+        # if dark bg, make text white
+        dark = False
+        for rgb in self.color:
+            if rgb > 128:
+                dark = True
+                break
         
+        if dark:
+            self.surface.blit(font.render(self.value,False,Colors[1]),(37,4))    # Value
+        else:
+            self.surface.blit(font.render(self.value,False,Colors[0]),(37,4))    # Value
+
         if self.node.ptr != None:
-            self.surface.blit(font.render(self.ptrText,False,(0,0,0)),(37,50))    # Ptr
+            if type(self.node.ptr) == list:
+                yPos = 50
+                for pointer in self.node.ptr:
+                    self.surface.blit(font.render(f'{pointer.value}',False,(0,0,0)),(37,yPos))
+                    yPos += 50
+                    
+                    
+            else:        
+                self.surface.blit(font.render(self.ptrText,False,(0,0,0)),(37,50))    # Ptr
 
         Screen.blit(self.surface,self.rect)
     

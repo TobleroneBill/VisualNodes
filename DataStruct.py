@@ -5,7 +5,14 @@ class Node:
         self.ptr = None
     
     def set_next(self,Node):
-        self.ptr = Node
+        if self.ptr is not None:
+            if type(self.ptr) == list:
+                self.ptr = self.ptr + [Node]
+            else:
+                self.ptr = [self.ptr] + [Node]
+        else:
+            self.ptr = Node 
+
 
 class LinkedList:
     def __init__(self,head = None) -> None:
