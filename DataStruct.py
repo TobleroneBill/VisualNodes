@@ -13,14 +13,19 @@ class LinkedList:
         self.size = 0
     
     # add to end
-    def append(self,node):
+    def append(self,value):
         if self.headNode == None:
-            self.headNode = node
+            self.headNode = Node(value)
         else:
             addNode = self.headNode
             while addNode.ptr:
                 addNode = addNode.ptr
-            addNode.ptr = node
+            addNode.ptr = Node(value)
+        self.size +=1
+
+    # Apply function to all nodes
+    def iterate(self,func):
+        pass
 
     def printNodes(self):
             node = self.headNode

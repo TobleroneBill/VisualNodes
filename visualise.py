@@ -4,18 +4,21 @@ import pygame
 import sys
 import random
 
+# Pygame
 pygame.init()
 font = pygame.font.Font(None,70)
+icon = pygame.image.load(r'C:\Users\JOE\Desktop\Visualisations\DataStructs\Assets\Logo.png')
 
 # Mouse settings
 mousePrev = None
 mouseDelta = [0,0]
-mouseSelected = False
+mouseSelected = None
 
 # Default Node settings
 NodeScale = 1
 NodeRect = pygame.Rect(0,0,100,100)
 
+# Based on 
 # Colors for interaction
 Colors = (
 
@@ -250,16 +253,19 @@ def MouseCheck():
 #   - BG settings
 #
 class LevelManager:
-    def __init__(self,DataStruct):
+    def __init__(self,DataStruct,WinText,debug=True):
+        
         # Pygame stuff
         self.width = 960
         self.height = 540
         self.screen = pygame.display.set_mode((self.width, self.height))
-        pygame.display.set_caption("Nodes Testing")
+        pygame.display.set_caption(WinText)
+        pygame.display.set_icon(icon)
         self.clock = pygame.time.Clock()
+        self.debug = debug
 
         # Data stuff
-        self.data = DataStruct  # Holds the actual Data structure info
+        self.data = list(DataStruct)  # Holds the actual Data structure info
         self.visData = self.GenerateVis()         # Holds the visual representations of those data structures
 
         # Gameplay stuff
@@ -269,16 +275,28 @@ class LevelManager:
     def GenerateVis(self):
         visnodes = []
         x,y = 0,0
+        # print([node.ptr for node in self.data])
         # loop through any data type given in instructor - Node, linked list etc.
-        for index,ClassName in enumerate(list(self.data)):
-            # print((type(ClassName)))
-            match type(ClassName):
+        for index,Class in enumerate(list(self.data)):
+            print(index,Class)
+            match type(Class):
                 # Single Node
                 case DataStruct.Node:
-                    visnodes.append(VisNode(self.data[index],(random.randint(0,self.width-100),random.randint(0,self.height-100))))
+                    visnodes.append(
+                        VisNode(self.data[index],(random.randint(0,self.width-100),random.randint(0,self.height-100),))
+                        )
                 case DataStruct.LinkedList:
-                    pass
+                    ptr = Class.headNode
+                    while ptr:
+                        visnodes.append(
+                        VisNode(ptr,(random.randint(0,self.width-100),random.randint(0,self.height-100)))
+                        )
+                        print(ptr.value)
+                        ptr = ptr.ptr
+                    print('LinkedList')
+                        
             y += 100
+        print([node.value for node in visnodes])
         return visnodes
 
     #/________________________/Update Methods/________________________/
@@ -295,9 +313,12 @@ class LevelManager:
                 # Draw Nodes
                 self.Draw()
 
+                self.clock.tick(60)
+                if self.debug:
+                    fpsText = font.render(f'{int(self.clock.get_fps())}',0,(255,255,255))
+                    self.screen.blit(fpsText,(0,0))
 
                 pygame.display.flip()
-                self.clock.tick(60)
     
     def Draw(self):
         MouseCheck()
@@ -309,21 +330,28 @@ class VisNode:
     """
     Visual Repesentation of nodes
     """
-
     def __init__(self, Node, Vector2D) -> None:
         self.node = Node
         self.sizeY = NodeRect.height * NodeScale    # will increase based on if it has many pointers
+        
         self.rect = pygame.Rect(Vector2D[0],Vector2D[1],NodeRect.width,self.sizeY)
+        
         self.surface = pygame.surface.Surface((100,self.sizeY))
-        
         self.value = f'{self.node.value}'
-        self.ptr = f'{self.node.ptr}'
-
-        self.pressed = False
+        self.ptrText = None
+        if self.node.ptr != None:
+            #long lol
+            self.ptrText = f'{self.node.ptr.value}'
         self.color = random.choice(RandomColors)
-
-    def Draw(self, Screen):
         
+    
+    def PtrText(self):
+        if self.ptrNode is None:
+            return f' '
+        else:
+            return f'{self.ptrNode.value}'
+        
+    def Draw(self, Screen):
         # Node Base 
         self.surface.fill(Colors[0])    # Bottom Half
         pygame.draw.rect(self.surface,self.color,(0,0,100,100//2))          # Top half
@@ -331,7 +359,9 @@ class VisNode:
         
         # Render Text
         self.surface.blit(font.render(self.value,False,Colors[1]),(37,4))    # Value
-        # self.surface.blit(font.render(self.ptr,False,Colors[1]),(37,4))    # Ptr
+        
+        if self.node.ptr != None:
+            self.surface.blit(font.render(self.ptrText,False,(0,0,0)),(37,50))    # Ptr
 
         Screen.blit(self.surface,self.rect)
     
@@ -342,19 +372,19 @@ class VisNode:
     # will move to mouse pos
     # Issue with ordering - need a system to differentiate whats on top
     def Move(self):
-        global mousePrev, mouseDelta
+        global mousePrev, mouseDelta, mouseSelected
 
+        # if mousing over and pressing left click
         if self.rect.collidepoint(pygame.mouse.get_pos()) and pygame.mouse.get_pressed() == (1,0,0):
-            self.pressed = True
+            if mouseSelected == None:
+                mouseSelected = self
 
-        if self.pressed:
+        if mouseSelected == self:
             self.surface.set_alpha(128)
             self.rect.x += mouseDelta[0]
             self.rect.y += mouseDelta[1]
             if pygame.mouse.get_pressed() != (1,0,0):
-                self.pressed = False
-
+                 mouseSelected = None
         else:
             self.surface.set_alpha(256)
         
-        return self.pressed
