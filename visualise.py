@@ -76,36 +76,41 @@ class LevelManager:
 
 
         # Data stuff
-        self.data = list(DataStruct)  # Holds the actual Data structure info
-        self.visData = self.GenerateVis()         # Holds the visual representations of those data structures
+        # if multiple inputs
+        if type(DataStruct) in [list,tuple,set]:
+            self.data = list(DataStruct)  # Holds the actual Data structure info
+        else:
+            self.data = [DataStruct]
+        self.visData = self.GenerateVis(self.data)         # Holds the visual representations of those data structures
+        self.colorlist = [NodeColors.RandomColor() for structure in self.visData]
 
         # Gameplay stuff
         self.selected = None
         self.mouseScreen = CursorImages['idle']
 
     #/________________________/Setup Methods/________________________/
-    def GenerateVis(self):
+    def GenerateVis(self,data):
         visnodes = []
-        x,y = 0,0
         # print([node.ptr for node in self.data])
         # loop through any data type given in instructor - Node, linked list etc.
-        for index,Class in enumerate(list(self.data)):
+        for index,Class in enumerate(list(data)):
             print(index,Class)
             match type(Class):
                 # Single Node
                 case DataStruct.Node:
                     visnodes.append(
-                        VisNode(self.data[index],(random.randint(0,self.width-100),random.randint(0,self.height-100),))
+                        VisNode(data[index],(random.randint(0,self.width-100),random.randint(0,self.height-100),))
                         )
                 case DataStruct.LinkedList:
+                    NodeList = []
                     ptr = Class.headNode
                     while ptr:
-                        visnodes.append(
+                        NodeList.append(
                         VisNode(ptr,(random.randint(0,self.width-100),random.randint(0,self.height-100)))
                         )
                         ptr = ptr.ptr
-            y += 100
-        print([node.value for node in visnodes])
+                    visnodes.append(NodeList)
+        # 6print([node.value for node in visnodes])
         return visnodes
 
     #/________________________/Update Methods/________________________/
@@ -131,8 +136,10 @@ class LevelManager:
     
     def Draw(self):
         MouseCheck()
-        for node in self.visData:
-            node.Update(self.screen)
+        self.DrawConnections()
+        for datastructure in self.visData:
+            for node in datastructure:
+                node.Update(self.screen)
         # Draw mouse over all
         self.DrawMouse()
 
@@ -148,6 +155,12 @@ class LevelManager:
             pygame.mouse.get_pos()[0]-self.mouseScreen.get_width()//2,  
             pygame.mouse.get_pos()[1]-self.mouseScreen.get_height()//2))
 
+    def DrawConnections(self):
+        for color,datastructure in enumerate(self.visData):
+            for index,node in enumerate(datastructure):
+                if index == len(datastructure)-1:
+                    break
+                pygame.draw.line(self.screen,self.colorlist[color],node.rect.center,datastructure[index+1].rect.center,5) 
 class VisNode:
     """
     Visual Repesentation of nodes
@@ -165,13 +178,11 @@ class VisNode:
                 self.sizeY += 50 * (len(self.node.ptr)-1)
             else:
                 self.ptrText = f'{self.node.ptr.value}' # long ass chain :0 
-        
 
         self.rect = pygame.Rect(Vector2D[0],Vector2D[1],NodeRect.width,self.sizeY)
         self.surface = pygame.surface.Surface((100,self.sizeY))
 
         self.color = NodeColors.RandomColor()
-        
         
     def Draw(self, Screen):
         # Node Base 
@@ -188,26 +199,40 @@ class VisNode:
                 break
         
         if dark:
-            self.surface.blit(font.render(self.value,False,Colors[1]),(37,4))    # Value
+            self.surface.blit(font.render(self.value,False,Colors[1]),(5,4))    # Value
         else:
-            self.surface.blit(font.render(self.value,False,Colors[0]),(37,4))    # Value
+            self.surface.blit(font.render(self.value,False,Colors[0]),(5,4))    # Value
 
         if self.node.ptr != None:
             if type(self.node.ptr) == list:
                 yPos = 50
                 for pointer in self.node.ptr:
-                    self.surface.blit(font.render(f'{pointer.value}',False,(0,0,0)),(37,yPos))
+                    self.surface.blit(font.render(f'{pointer.value}',False,(0,0,0)),(5,yPos))
                     yPos += 50
-                    
-                    
             else:        
-                self.surface.blit(font.render(self.ptrText,False,(0,0,0)),(37,50))    # Ptr
+                self.surface.blit(font.render(self.ptrText,False,(0,0,0)),(5,50))    # Ptr
 
         Screen.blit(self.surface,self.rect)
-    
+
+    def OOB(self):
+
+        # self.width = 960
+        # self.height = 540
+
+        if self.rect.x < 0:
+            self.rect.x = 0
+        if self.rect.x > 960-100:
+            self.rect.x = 960 - 100
+        
+        if self.rect.y < 0:
+            self.rect.y = 0
+        if self.rect.y > 540 - self.sizeY:
+            self.rect.y = 540 - self.sizeY
+
     def Update(self,Screen):
         self.Move()
         self.Draw(Screen)
+        self.OOB()
 
     # will move to mouse pos
     # Issue with ordering - need a system to differentiate whats on top

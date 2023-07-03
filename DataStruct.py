@@ -33,6 +33,31 @@ class LinkedList:
     # Apply function to all nodes
     def iterate(self,func):
         pass
+    
+
+    def insert(self,value,index):
+        # head
+        if index <= 0:
+            next = self.headNode
+            self.headNode = Node(value)
+            self.headNode.ptr = next
+            self.size +=1
+            return
+        if index > self.size:
+            self.append(value)
+            return
+
+        # loop to index (will never be OOB)
+        ptr = self.headNode
+        for i in range(index-1):
+            ptr = ptr.ptr
+        
+        #insert
+        insertNode = Node(value)
+        insertNode.ptr = ptr.ptr
+        ptr.ptr = insertNode
+
+
 
     def printNodes(self):
             node = self.headNode
